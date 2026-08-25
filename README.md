@@ -95,17 +95,15 @@ The processed datasets are stored in Parquet format with Snappy compression, pro
 
 Bronze Layer
 
-The Bronze layer preserves the source-oriented structure of the IMDb dataset. Individual IMDb datasets are stored separately so that the original relationships between titles, ratings, episodes, people, and other entities can be maintained.
+The Bronze layer preserves the source-oriented structure of the IMDb dataset. Individual IMDb datasets are stored separately so that the original relationships between titles, ratings, people, and other entities can be maintained.
 
 Typical Bronze datasets include:
 
-title_basics
-title_ratings
-title_episodes
-title_akas
-title_principals
+title_basics,
+title_ratings,
+title_akas,
+title_principals,
 name_basics
-title_crew
 
 This layer provides a reproducible starting point for subsequent transformations and prevents downstream processing from being tightly coupled to the original Kaggle files.
 
