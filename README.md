@@ -143,7 +143,6 @@ This makes the resulting data easier for analysts to query than the original IMD
 Hive Metastore – Metadata Management
 
 Hive Metastore is used as the metadata catalog for the Spark tables. It does not store the actual Parquet data. Instead, it maintains information about tables, columns, data types, partitions, table properties, and physical storage locations.
-
 PostgreSQL is used as the persistent backend database for the Hive Metastore.
 
 The separation is therefore:
@@ -153,29 +152,19 @@ The separation is therefore:
                           │ metadata
                           ▼
                     PostgreSQL
-                     
-Actual Data
-     │
-     ▼
-    MinIO
 
 This allows Spark to discover and manage tables while the actual datasets remain in the object-storage layer.
 
 
 
 PostgreSQL
-
 PostgreSQL is used for metadata persistence within the platform. The project uses PostgreSQL for the supporting databases required by Airflow and Hive Metastore.
-
 It is important to distinguish PostgreSQL's role from ClickHouse's role. PostgreSQL is primarily used as a metadata and application database in this architecture, while ClickHouse is used as the analytical OLAP engine.
-
-
 
 
 ClickHouse – OLAP Serving Layer
 
 ClickHouse is the final analytical serving layer of the pipeline. Once Spark has completed the transformations and produced the Gold datasets, the business-ready data is loaded into ClickHouse.
-
 The ClickHouse database contains analytical tables such as:
 
 imdb_olap
@@ -188,19 +177,3 @@ imdb_olap
 └── fact_final
 
 ClickHouse is used because the final workload is primarily analytical, involving filtering, aggregation, grouping, ranking, and large-scale scans.
-
-The architecture separates ETL processing from analytical serving:
-
-Spark
-  │
-  │ Heavy transformations
-  ▼
-Parquet / MinIO
-  │
-  │ Curated Gold data
-  ▼
-ClickHouse
-  │
-  │ Fast analytical queries
-  ▼
-Business Insights
