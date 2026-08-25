@@ -1,0 +1,32 @@
+FROM apache/spark:4.0.0
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y python3-pip python3-dev build-essential && \
+    pip3 install jupyterlab pyspark==4.0.0 numpy pandas ipython kagglehub boto3 minio s3fs pyarrow pandas botocore clickhouse-connect && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.1/hadoop-aws-3.4.1.jar && \
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.24.6/bundle-2.24.6.jar && \ 
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/com/clickhouse/spark/clickhouse-spark-runtime-4.0_2.13/0.10.0/clickhouse-spark-runtime-4.0_2.13-0.10.0.jar && \
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/com/clickhouse/clickhouse-jdbc/0.9.5/clickhouse-jdbc-0.9.5-all-dependencies.jar
+
+RUN mkdir -p /nonexistent/.local/share/jupyter/runtime && \
+    mkdir -p /opt/jupyter && \
+    chown -R spark:spark /nonexistent && \
+    chown -R spark:spark /opt/jupyter && \ 
+    chown -R spark:spark $SPARK_HOME/jars
+
+USER spark
+#ENV SHELL /bin/bash
+
+#WORKDIR /opt/spark-notebooks
+#EXPOSE 8888 4040
+
+#CMD ["python3", "-m", "jupyterlab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--ServerApp.token=''"]

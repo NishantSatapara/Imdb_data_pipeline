@@ -1,0 +1,43 @@
+FROM apache/airflow:3.3.0
+
+USER root
+
+ARG SPARK_VERSION=4.0.0
+
+# Install Java and utilities
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        openjdk-17-jre-headless \
+        curl \
+        procps && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Spark client
+ENV SPARK_HOME=/opt/spark
+
+RUN curl -fsSL \
+    https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    | tar -xz -C /opt && \
+    mv /opt/spark-${SPARK_VERSION}-bin-hadoop3 ${SPARK_HOME}
+
+# Detect JAVA_HOME automatically and make it available
+RUN JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && \
+    echo "JAVA_HOME=${JAVA_HOME}" >> /etc/environment && \
+    echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/profile
+
+RUN wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.1/hadoop-aws-3.4.1.jar && \
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.24.6/bundle-2.24.6.jar && \
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/com/clickhouse/spark/clickhouse-spark-runtime-4.0_2.13/0.10.0/clickhouse-spark-runtime-4.0_2.13-0.10.0.jar && \
+    wget -P $SPARK_HOME/jars \
+    https://repo1.maven.org/maven2/com/clickhouse/clickhouse-jdbc/0.9.5/clickhouse-jdbc-0.9.5-all-dependencies.jar
+
+ENV PATH="${SPARK_HOME}/bin:${PATH}"
+    
+# Install Spark provider for Airflow
+RUN pip3 install --no-cache-dir apache-airflow-providers-apache-spark apache-airflow-task-sdk
+RUN pip3 install --no-cache-dir pyspark==4.0.0 apache-airflow-providers-amazon boto3 botocore kagglehub minio s3fs pyarrow pandas clickhouse-connect
+
+USER airflow
