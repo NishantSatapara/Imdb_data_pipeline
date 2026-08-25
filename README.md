@@ -83,10 +83,10 @@ MinIO provides the project's S3-compatible object storage layer. It acts as the 
 s3a://imdb-bucket/...
 The lake is organized into logical processing layers:
 
-lake/
-├── bronze/
-├── silver/
-└── gold/
+raw--->
+bronze---->
+silver ---->
+gold 
 
 The Bronze layer represents the raw or minimally processed IMDb data. The Silver layer contains cleaned and standardized datasets. The Gold layer contains business-ready datasets optimized for downstream analytics and OLAP ingestion.
 The processed datasets are stored in Parquet format with Snappy compression, providing columnar storage, efficient compression, predicate pushdown, and column pruning for analytical workloads.
