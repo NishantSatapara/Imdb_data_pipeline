@@ -62,22 +62,6 @@ Apache Airflow acts as the orchestration layer of the platform. The Airflow DAG 
 
 Airflow does not perform the heavy data transformation itself. Instead, it submits PySpark applications to the Spark cluster using spark-submit. This separation allows Airflow to focus on workflow orchestration while Spark is responsible for distributed computation.
 
-The high-level workflow is:
-
-Download IMDb Data
-        ↓
-Raw Data Validation
-        ↓
-Bronze Processing
-        ↓
-Silver Transformation
-        ↓
-Gold Business Transformation
-        ↓
-Load Gold Data into ClickHouse
-        ↓
-
-
 Run Analytics
 Apache Spark – Distributed Data Processing
 
